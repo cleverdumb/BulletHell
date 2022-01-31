@@ -3,7 +3,7 @@ class Player {
         this.x = x;
         this.y = y;
         this.color = 'white';
-        this.r = 20;
+        this.r = 15;
         this.health = 100;
         this.shootSpeed = 3;
         this.dmg = 20;

@@ -1,0 +1,170 @@
+<html>
+    <head>
+        <title>Bullet hell</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <canvas id='cvs'></canvas>
+        <script src='player.js'></script>
+        <script src='enemies.js'></script>
+        <script src='projectiles.js'></script>
+        <script>
+            const cvs = document.getElementById('cvs');
+            const ctx = cvs.getContext('2d');
+
+            cvs.width = 600;
+            cvs.height = 600;
+            cvs.style.border = '1px black solid';
+
+            const WHOOSH = new Audio();
+            WHOOSH.src = 'resources/mixkit-metal-hit-woosh-1485.wav';
+            
+            const GUNSHOOT = new Audio();
+            GUNSHOOT.volume = 0.5;
+            GUNSHOOT.src = 'resources/gun-gunshot-01.wav';
+
+            const game = {
+                w:600,
+                h:600,
+                bgcolor:'rgba(0,0,0,0.3)',
+                frame:0,
+                clear:function() {
+                    ctx.fillStyle = this.bgcolor;
+                    ctx.fillRect(0,0,this.w,this.h);
+                },
+                animationId:0,
+                keys:{},
+                spawn:function() {
+                    if (this.frame%100==0) {
+                        // console.log('spawning');
+                        let x,y;
+                        if (Math.random()>0.5) {
+                            x = (Math.random()>0.5) ? -20 : this.w+20;
+                            y = Math.random()*this.h
+                        }
+                        else {
+                            y = (Math.random()>0.5) ? -20 : this.h+20;
+                            x = Math.random()*this.w
+                        }
+                        // console.log(`x: ${x} y: ${y}`)
+                        enemies.push(new Enemy(x,y,20,'yellow'))
+                    }
+                },
+                score:0,
+                renderScore:function() {
+                    ctx.fillStyle = 'green';
+                    ctx.font = '30px monospace';
+                    ctx.fillText(`Score: ${this.score}`,40,40);
+                },
+                renderHealth:function() {
+                    ctx.fillStyle = 'green';
+                    ctx.font = '30px monospace';
+                    ctx.fillText(`Life: ${player.health}`,400,40)
+                },
+                playerDie:function() {
+                    this.bgcolor = 'black';
+                    this.clear();
+                    ctx.fillStyle = 'red';
+                    ctx.font = '50px monospace';
+                    ctx.fillText('YOU DIED!',200,275);
+                }
+            }
+
+            let player = new Player(280,280);
+            let projectiles = [];
+            let enemies = [new Enemy(400,400,20,'yellow')]
+
+            function loop() {
+                game.animationId = requestAnimationFrame(loop);
+                game.frame++;
+                game.clear();
+                player.draw();
+                player.update();
+                enemies = enemies.filter(x=>!(x.shouldDelete))
+                enemies.forEach(x=>{
+                    x.draw();
+                    x.update();
+                })
+                projectiles = projectiles.filter(x=>!(x.shouldDelete))
+                projectiles.forEach(x=>{
+                    x.draw();
+                    x.update();
+                })
+                game.spawn();
+                checkKeys();
+                game.renderScore();
+                game.renderHealth();
+            }
+
+            loop()
+
+            $(document).keydown((e)=>{
+                game.keys[e.key] = true;
+            })
+
+            $(document).keyup((e)=>{
+                game.keys[e.key] = false;
+            })
+
+            function checkKeys() {
+                if (game.keys.w) {
+                    if (player.y-player.r>20) {
+                        gsap.to(player,{
+                            y:player.y-20,
+                            duration:0.2
+                        })
+                    }
+                    else {
+                        gsap.to(player,{
+                            y:player.y-(player.y-player.r),
+                            duration:0.2
+                        })
+                    }
+                }
+                if (game.keys.a) {
+                    if (player.x-player.r>20) {
+                        gsap.to(player,{
+                            x:player.x-20,
+                            duration:0.2
+                        })
+                    }
+                    else {
+                        gsap.to(player,{
+                            x:player.x-(player.x-player.r),
+                            duration:0.2
+                        })
+                    }
+                }
+                if (game.keys.s) {
+                    if (player.y+player.r<game.h-20) {
+                        gsap.to(player,{
+                            y:player.y+20,
+                            duration:0.2
+                        })
+                    }
+                    else {
+                        gsap.to(player,{
+                            y:player.y+(game.h-player.y-player.r),
+                            duration:0.2
+                        })
+                    }
+                }
+                if (game.keys.d) {
+                    if (player.x+player.r<game.w-20) {
+                        gsap.to(player,{
+                            x:player.x+20,
+                            duration:0.2
+                        })
+                    }
+                    else {
+                        gsap.to(player,{
+                            x:player.x+(game.w-player.x-player.r),
+                            duration:0.2
+                        })
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>

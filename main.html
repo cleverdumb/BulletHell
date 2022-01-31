@@ -48,7 +48,13 @@
                             x = Math.random()*this.w
                         }
                         // console.log(`x: ${x} y: ${y}`)
-                        enemies.push(new Enemy(x,y,20,'yellow'))
+                        let random = Math.round(Math.random()*100);
+                        if (random<10) {
+                            enemies.push(new CurveEnemy(x,y,20,'red'));
+                        }
+                        else {
+                            enemies.push(new Enemy(x,y,20,'yellow'));
+                        }
                     }
                 },
                 score:0,
@@ -68,6 +74,13 @@
                     ctx.fillStyle = 'red';
                     ctx.font = '50px monospace';
                     ctx.fillText('YOU DIED!',200,275);
+                    let high = parseInt(localStorage.getItem('$bulletHell_highScore')) || 0;
+                    if (this.score >= high) {
+                        localStorage.setItem('$bulletHell_highScore',this.score);
+                    }
+                    ctx.fillText(`Your score: ${this.score}`,200,345);
+                    ctx.font = '30px monospace';
+                    ctx.fillText(`Your high score: ${localStorage.getItem('$bulletHell_highScore')}`,200,415)
                 }
             }
 

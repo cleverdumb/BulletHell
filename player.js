@@ -1,3 +1,5 @@
+console.log('player loaded');
+
 class Player {
     constructor(x,y) {
         this.x = x;

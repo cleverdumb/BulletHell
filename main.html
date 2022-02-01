@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Bullet hell</title>
+        <meta content='no-cache'>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
@@ -10,6 +11,8 @@
         <script src='enemies.js'></script>
         <script src='projectiles.js'></script>
         <script>
+            console.log('main loaded');
+
             const cvs = document.getElementById('cvs');
             const ctx = cvs.getContext('2d');
 
@@ -49,8 +52,11 @@
                         }
                         // console.log(`x: ${x} y: ${y}`)
                         let random = Math.round(Math.random()*100);
-                        if (random<10) {
+                        if (random<5) {
                             enemies.push(new CurveEnemy(x,y,20,'red'));
+                        }
+                        else if (random>4 && random<10) {
+                            enemies.push(new LandmineShooter(x,y,20,'cyan'));
                         }
                         else {
                             enemies.push(new Enemy(x,y,20,'yellow'));
@@ -73,20 +79,20 @@
                     this.clear();
                     ctx.fillStyle = 'red';
                     ctx.font = '50px monospace';
-                    ctx.fillText('YOU DIED!',200,275);
+                    ctx.fillText('YOU DIED!',100,275);
                     let high = parseInt(localStorage.getItem('$bulletHell_highScore')) || 0;
                     if (this.score >= high) {
                         localStorage.setItem('$bulletHell_highScore',this.score);
                     }
-                    ctx.fillText(`Your score: ${this.score}`,200,345);
+                    ctx.fillText(`Your score: ${this.score}`,100,345);
                     ctx.font = '30px monospace';
-                    ctx.fillText(`Your high score: ${localStorage.getItem('$bulletHell_highScore')}`,200,415)
+                    ctx.fillText(`Your high score: ${localStorage.getItem('$bulletHell_highScore')}`,100,415)
                 }
             }
 
             let player = new Player(280,280);
             let projectiles = [];
-            let enemies = [new CurveEnemy(400,400,20,'red')]
+            let enemies = []
 
             function loop() {
                 game.animationId = requestAnimationFrame(loop);
